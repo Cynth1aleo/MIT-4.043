@@ -1,0 +1,126 @@
+#include <Keyboard.h>      // include library that let's Arduino act as a keyboard
+#include <RotaryEncoder.h>  // include rotary encoder library
+
+// set the pins
+const int p1_left = A2;
+const int p1_right = A3;
+const int p1_set = 3;
+const int p2_left = 6;
+const int p2_right = 8;
+const int p2_set = 7;
+
+// //joystick test
+// const int p3_x = A1;
+// const int p3_y = A0;
+
+// //BLOW test
+const int p3_x = 9;
+const int p3_y = 10;
+const int p3_set = A0;
+
+// set RotaryEncoder
+RotaryEncoder encoder(A0, A1);
+
+// some useful values
+#define OFF 0
+#define ON 1
+
+//players Status
+
+int p1_left_last =0 ;
+int p1_right_last =0 ;
+int p1_set_last =0 ;
+
+int p2_left_last = 0;
+int p2_right_last = 0;
+int p2_set_last = 0;
+
+int  p3_xPosition= 0;
+int p3_x_last =0;
+int p3_set_last=0;
+
+
+void setup() {
+  // put your setup code here, to run once:
+  pinMode(p2_left, INPUT_PULLUP);
+  pinMode(p2_right, INPUT_PULLUP);
+  pinMode(p2_set, INPUT_PULLUP);
+  pinMode(p3_x, INPUT);
+  pinMode(p3_y, INPUT);
+  pinMode(p3_set, INPUT_PULLUP);
+  // start the keyboard
+  Keyboard.begin();
+  Serial.begin(9600);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+
+//////////////////////////////////////////////
+ //player1 left arrow
+int p1_left_sensor = analogRead(p1_left);
+ if (p1_left_sensor - p1_left_last > 100) {
+  Keyboard.write(KEY_LEFT_ARROW);
+ }
+ p1_left_last = p1_left_sensor;
+
+//player1 right arrow
+int p1_right_sensor = analogRead(p1_right);
+ if (p1_right_sensor - p1_right_last > 10 && p1_left_sensor == 0 && p1_right_last == 0) {
+  Keyboard.write(KEY_RIGHT_ARROW);
+ }
+ p1_right_last = p1_right_sensor;
+
+//player1 set
+int p1_set_sensor = digitalRead(p1_set);
+if (p1_set_sensor == 1 && p1_set_last == 0) {
+  Keyboard.write(KEY_DOWN_ARROW);
+ }
+  p1_set_last = p1_set_sensor;
+
+//////////////////////////////////////////////
+//player2 left
+int p2_left_metal = digitalRead(p2_left);
+ if (p2_left_last - p2_left_metal  == 1) {
+  Keyboard.write(65);
+ }
+ p2_left_last = p2_left_metal;
+
+//player2 right
+int p2_right_metal = digitalRead(p2_right);
+ if (p2_right_last - p2_right_metal  == 1) {
+  Keyboard.write(68);
+ }
+ p2_right_last = p2_right_metal;
+
+//player2 set
+int p2_set_metal = digitalRead(p2_set);
+ if (p2_set_last - p2_set_metal  == 1) {
+  Keyboard.write(83);
+ }
+ p2_set_last = p2_set_metal;
+
+//////////////////////////////////////////////
+//player3 left & right joystick
+p3_xPosition = analogRead(p3_x);
+if (p3_xPosition >600 && (p3_x_last == 512 || p3_x_last == 511)) {
+  Keyboard.write(76);
+}
+if (p3_xPosition < 450 && (p3_x_last == 512 || p3_x_last == 511)) {
+  Keyboard.write(74);
+}
+ p3_x_last = p3_xPosition;
+
+//player3 left & right blow
+int p3_set_blow = analogRead(A0);
+
+if (p3_set_blow > 200 && p3_set_last < 135){
+  Keyboard.write(75);
+}
+p3_set_last = p3_set_blow;
+Serial.println(analogRead(A0));
+
+
+delay(100);
+
+}
